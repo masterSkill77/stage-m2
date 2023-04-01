@@ -17,4 +17,8 @@ class NftService
         $nft->save();
         return $nft;
     }
+    public function myNfts(int $userId, int | null $perPage = 1)
+    {
+        return Nft::with(['category', 'owner'])->where('owner_id', $userId)->paginate($perPage);
+    }
 }

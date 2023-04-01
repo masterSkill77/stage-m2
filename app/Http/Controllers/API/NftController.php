@@ -28,4 +28,12 @@ class NftController extends Controller
 
         return response()->json(['data' => $nft], Response::HTTP_CREATED);
     }
+
+    public function mine(Request $request)
+    {
+        $userId = auth()->user()->id;
+        $perPage = $request->query('perPage');
+        $myNfts = $this->nftService->myNfts($userId, $perPage);
+        return response()->json(['data' => $myNfts]);
+    }
 }
