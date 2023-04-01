@@ -37,4 +37,9 @@ class NftService
         $oldOwner = User::findOrFail($oldOwner);
         $nft = Nft::findOrFail($nft);
     }
+
+    public function getNft($idNft)
+    {
+        return Nft::findOrFail($idNft);
+    }
 }
