@@ -24,6 +24,8 @@ Route::apiResources(
     [
         'nft' => NftController::class
     ],
-    //  ['middleware' => ['auth:sanctum']]
+    [
+        'middleware' => ['auth:sanctum']
+    ]
 );
 Route::post('/login', [AuthController::class, 'login']);

@@ -10,4 +10,11 @@ class NftService
     {
         return Nft::with(['category', 'owner'])->paginate($perPage);
     }
+    public function store(array $data, int $userId)
+    {
+        $data['owner_id'] = $userId;
+        $nft = new Nft($data);
+        $nft->save();
+        return $nft;
+    }
 }
