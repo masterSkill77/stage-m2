@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\NftController;
+use App\Http\Controllers\API\TransfertController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -32,4 +33,8 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::prefix('/mine')->middleware('auth:sanctum')->group(function () {
     Route::get('nft', [NftController::class, 'mine']);
+});
+
+Route::prefix('transfert')->middleware('auth:sanctum')->group(function () {
+    Route::post('/', [TransfertController::class, 'transfert']);
 });

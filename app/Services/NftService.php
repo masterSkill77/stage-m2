@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Nft;
+use App\Models\User;
 
 class NftService
 {
@@ -28,5 +29,12 @@ class NftService
         $nft->image_uri = $data['image_uri'];
         $nft->save();
         return $nft;
+    }
+
+    public function affectNft(int $newOwner, int $oldOwner, int $nft)
+    {
+        $newOwner = User::findOrFail($newOwner);
+        $oldOwner = User::findOrFail($oldOwner);
+        $nft = Nft::findOrFail($nft);
     }
 }
