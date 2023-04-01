@@ -21,4 +21,12 @@ class NftService
     {
         return Nft::with(['category', 'owner'])->where('owner_id', $userId)->paginate($perPage);
     }
+    public function update(array $data, Nft $nft)
+    {
+        $nft->title = $data['title'];
+        $nft->description = $data['description'];
+        $nft->image_uri = $data['image_uri'];
+        $nft->save();
+        return $nft;
+    }
 }

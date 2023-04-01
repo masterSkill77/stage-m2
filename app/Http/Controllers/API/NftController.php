@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exceptions\NotYourNftException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Nft\CreateNftRequest;
+use App\Models\Nft;
 use App\Services\NftService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -29,11 +31,23 @@ class NftController extends Controller
         return response()->json(['data' => $nft], Response::HTTP_CREATED);
     }
 
+    public function update(CreateNftRequest $request, Nft $nft)
+    {
+        if ($nft->owner_id != auth()->user()->id) throw new NotYourNftException();
+
+        $update = $this->nftService->update($request->toArray(), $nft);
+
+        return response()->json(['data' => $update]);
+    }
     public function mine(Request $request)
     {
         $userId = auth()->user()->id;
         $perPage = $request->query('perPage');
         $myNfts = $this->nftService->myNfts($userId, $perPage);
         return response()->json(['data' => $myNfts]);
+    }
+    public function show(Nft $nft)
+    {
+        return response()->json(['data' => $nft]);
     }
 }
