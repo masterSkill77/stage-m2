@@ -20,10 +20,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('auth:sanctum')->apiResources(
+Route::apiResources(
     [
         'nft' => NftController::class
-    ]
+    ],
+    //  ['middleware' => ['auth:sanctum']]
 );
-
 Route::post('/login', [AuthController::class, 'login']);
