@@ -2,9 +2,12 @@
 
 namespace App\Mail;
 
+use App\Models\Auction;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -16,7 +19,7 @@ class AuctionWinner extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(public Auction $auction, public User $user)
     {
         //
     }
@@ -38,6 +41,7 @@ class AuctionWinner extends Mailable
     {
         return new Content(
             view: 'vendor.notification.winner',
+
         );
     }
 

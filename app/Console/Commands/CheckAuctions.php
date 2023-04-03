@@ -35,7 +35,7 @@ class CheckAuctions extends Command
         DB::beginTransaction();
 
         try {
-            $endedAuctions = Auction::where('end_date', '<=', now())
+            $endedAuctions = Auction::with(['nft'])->where('end_date', '<=', now())
                 ->where('status', 0)
                 ->get();
 
@@ -49,7 +49,7 @@ class CheckAuctions extends Command
                 if ($highestBid) {
                     $winner = User::find($highestBid->bidder_id);
                     Auction::where('id', $auction->id)->update(['winner_id' => $winner->id]);
-                    Mail::to($winner->email)->send(new AuctionWinner($auction));
+                    Mail::to($winner->email)->send(new AuctionWinner($auction, $winner));
                 }
             }
             DB::commit();
