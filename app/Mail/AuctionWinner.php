@@ -37,7 +37,7 @@ class AuctionWinner extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'welcome',
+            view: 'vendor.notification.winner',
         );
     }
 
