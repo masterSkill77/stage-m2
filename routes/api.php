@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuctionController;
+use App\Http\Controllers\API\BidController;
 use App\Http\Controllers\API\NftController;
 use App\Http\Controllers\API\TransfertController;
 use App\Http\Controllers\AuthController;
@@ -25,7 +26,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::apiResources(
     [
         'nft' => NftController::class,
-        'auction' => AuctionController::class
+        'auction' => AuctionController::class,
+        'bid' => BidController::class
     ],
     [
         'middleware' => ['auth:sanctum']

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Auction extends Model
 {
@@ -19,5 +20,9 @@ class Auction extends Model
     public function nft(): BelongsTo
     {
         return $this->belongsTo(Nft::class, 'nft_id');
+    }
+    public function bids(): HasMany
+    {
+        return $this->hasMany(Bid::class, 'bidder_id');
     }
 }
