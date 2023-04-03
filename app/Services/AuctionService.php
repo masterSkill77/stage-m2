@@ -18,4 +18,11 @@ class AuctionService
     {
         return Auction::with(['nft', 'owner'])->paginate($perPage);
     }
+
+    public function changeCurrentBid(Auction $auction, float $bid)
+    {
+        $auction->current_bid = $bid;
+        $auction->save();
+        return $auction;
+    }
 }
