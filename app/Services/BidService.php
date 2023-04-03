@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Exceptions\BidTooLowException;
 use App\Models\Bid;
+use App\Notifications\NewBidNotification;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -18,17 +19,16 @@ class BidService
         return DB::transaction(function () use ($data) {
             try {
                 $auction = $this->auctionService->getAuction($data['auction_id']);
-                if ($auction->current_bid >= $data['bid_amount'])
+                if ($auction->current_bid >= $data['bid_amount'] || $auction->start_price >= $data['bid_amount'])
                     throw new BidTooLowException();
                 $bid = new Bid($data);
                 $bid->save();
                 $this->auctionService->changeCurrentBid($auction, $data['bid_amount']);
                 $toNotify = $this->getAllBidderExceptMaker($auction->id, $data['bidder_id']);
-                // foreach ($toNotify as $user)
-                //     return $user->bidder->notify();
-
-                return $bid;
+                foreach ($toNotify as $user)
+                    $user->bidder->notify(new NewBidNotification($auction));
                 DB::commit();
+                return $bid;
             } catch (Exception $e) {
                 DB::rollBack();
                 throw $e;
@@ -45,6 +45,6 @@ class BidService
         return Bid::with('bidder')->where(
             'auction_id',
             $auctionId
-        )->whereNot('bidder_id', $exceptBidderId)->get();
+        )->whereNot('bidder_id', $exceptBidderId)->groupBy('bidder_id')->get();
     }
 }
