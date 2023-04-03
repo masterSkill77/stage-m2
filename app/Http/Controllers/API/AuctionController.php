@@ -8,6 +8,7 @@ use App\Http\Requests\Auction\CreateAuctionRequest;
 use App\Services\AuctionService;
 use App\Services\NftService;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AuctionController extends Controller
 {
@@ -43,9 +44,13 @@ class AuctionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(int $id)
     {
-        //
+        $auction = $this->auctionService->getAuction($id);
+        if (!$auction) {
+            throw new NotFoundHttpException();
+        }
+        return response()->json(['data' => $auction]);
     }
 
     /**

@@ -18,7 +18,7 @@ class AuctionService
     {
         return Auction::with(['nft', 'owner', 'bids'])->paginate($perPage);
     }
-    public function getAuction(int $auctionId): Auction
+    public function getAuction(int $auctionId): Auction | null
     {
         return Auction::with(['nft', 'owner', 'bids'])->where('id', $auctionId)->first();
     }
