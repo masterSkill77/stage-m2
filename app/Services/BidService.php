@@ -26,7 +26,7 @@ class BidService
                 $this->auctionService->changeCurrentBid($auction, $data['bid_amount']);
                 $toNotify = $this->getAllBidderExceptMaker($auction->id, $data['bidder_id']);
                 foreach ($toNotify as $user)
-                    $user->bidder->notify(new NewBidNotification($auction));
+                    $user->bidder->notify(new NewBidNotification($auction, $user->bidder));
                 DB::commit();
                 return $bid;
             } catch (Exception $e) {
