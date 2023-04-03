@@ -17,9 +17,11 @@ class AuctionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $perPage = $request->query('perPage');
+        $auctions = $this->auctionService->lists($perPage);
+        return response()->json(['data' => $auctions]);
     }
 
     /**

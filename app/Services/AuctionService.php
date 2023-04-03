@@ -14,4 +14,8 @@ class AuctionService
 
         return $auction;
     }
+    public function lists(int | null $perPage = 1)
+    {
+        return Auction::with(['nft', 'owner'])->paginate($perPage);
+    }
 }
