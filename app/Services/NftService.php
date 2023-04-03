@@ -40,6 +40,6 @@ class NftService
 
     public function getNft($idNft)
     {
-        return Nft::findOrFail($idNft);
+        return Nft::with(['category', 'owner'])->where('id', $idNft)->first();
     }
 }

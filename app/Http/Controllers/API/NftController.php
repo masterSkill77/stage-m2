@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class NftController extends Controller
 {
@@ -46,8 +47,12 @@ class NftController extends Controller
         $myNfts = $this->nftService->myNfts($userId, $perPage);
         return response()->json(['data' => $myNfts]);
     }
-    public function show(Nft $nft)
+    public function show(int $nftId)
     {
+        $nft = $this->nftService->getNft($nftId);
+        if (!$nft) {
+            return response()->json(['message' => 'NFT_NO_FOUND'], Response::HTTP_NOT_FOUND);
+        }
         return response()->json(['data' => $nft]);
     }
 }
