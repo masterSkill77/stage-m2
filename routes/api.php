@@ -5,6 +5,7 @@ use App\Http\Controllers\API\BidController;
 use App\Http\Controllers\API\NftController;
 use App\Http\Controllers\API\TransfertController;
 use App\Http\Controllers\AuthController;
+use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,4 +42,10 @@ Route::prefix('/mine')->middleware('auth:sanctum')->group(function () {
 
 Route::prefix('transfert')->middleware('auth:sanctum')->group(function () {
     Route::post('/', [TransfertController::class, 'transfert']);
+});
+
+
+Route::get('/test-paypal', function () {
+    $paymentService = new PaymentService();
+    return $paymentService->test();
 });
