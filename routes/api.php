@@ -7,6 +7,7 @@ use App\Http\Controllers\API\TransfertController;
 use App\Http\Controllers\AuthController;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,9 +35,13 @@ Route::apiResources(
         'middleware' => ['auth:sanctum']
     ]
 );
-Route::post('/login', [AuthController::class, 'login']);
 
-Route::prefix('/mine')->middleware('auth:sanctum')->group(function () {
+// Auth
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::get('verify/{userId}/{token}', [AuthController::class, 'verifyMail']);
+
+Route::prefix('/mine')->middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('nft', [NftController::class, 'mine']);
 });
 
