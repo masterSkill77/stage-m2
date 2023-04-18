@@ -7,6 +7,9 @@ use App\Models\User;
 
 class NftService
 {
+    public function __construct(public BlockchainService $blockchainService)
+    {
+    }
     public function lists(int | null $perPage = 1)
     {
         return Nft::with(['category', 'owner'])->paginate($perPage);
@@ -15,8 +18,10 @@ class NftService
     {
         $data['owner_id'] = $userId;
         $nft = new Nft($data);
+        $blockchainNft = $this->blockchainService->createNftOnBlockchain($data);
+
         $nft->save();
-        return $nft;
+        return ['nft' => $nft, 'on_blockchain' => $blockchainNft];
     }
     public function myNfts(int $userId, int | null $perPage = 1)
     {
