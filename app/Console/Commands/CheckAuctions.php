@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Mail\AuctionWinner;
 use App\Models\Auction;
 use App\Models\Bid;
+use App\Models\Nft;
 use App\Models\User;
 use Exception;
 use Illuminate\Console\Command;
@@ -48,6 +49,7 @@ class CheckAuctions extends Command
 
                 if ($highestBid) {
                     $winner = User::find($highestBid->bidder_id);
+                    Nft::where('id', $auction->nft_id)->update(['owner_id' => $winner->id]);
                     Auction::where('id', $auction->id)->update(['winner_id' => $winner->id]);
                     Mail::to($winner->email)->send(new AuctionWinner($auction, $winner));
                 }
