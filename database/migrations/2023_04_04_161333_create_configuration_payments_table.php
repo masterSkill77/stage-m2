@@ -18,7 +18,7 @@ return new class extends Migration
             $table->boolean('default')->default(false);
 
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('user_id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });
     }
