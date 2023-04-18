@@ -15,7 +15,8 @@ class Nft extends Model
         'description',
         'image_uri',
         'owner_id',
-        'category_id'
+        'category_id',
+        'token_id'
     ];
 
     public function category(): BelongsTo
