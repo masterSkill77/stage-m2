@@ -19,9 +19,9 @@ class NftService
         $data['owner_id'] = $userId;
         $nft = new Nft($data);
         $blockchainNft = $this->blockchainService->createNftOnBlockchain($data);
-
+        $nft->token_id = ($blockchainNft['tokenId']);
         $nft->save();
-        return ['nft' => $nft, 'on_blockchain' => $blockchainNft];
+        return $nft;
     }
     public function myNfts(int $userId, int | null $perPage = 1)
     {
