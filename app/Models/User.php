@@ -23,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'etherum_adress',
         'lastname',
         'username'
     ];

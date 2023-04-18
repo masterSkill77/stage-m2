@@ -29,7 +29,8 @@ class UserRegisterRequest extends FormRequest
             'email' => 'email|required',
             'password' => 'required',
             'lastname' => 'required',
-            'username' => 'required'
+            'username' => 'required',
+            'etherum_adress' => 'required'
         ];
     }
 
