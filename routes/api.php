@@ -54,3 +54,7 @@ Route::get('/test-paypal', function () {
     $paymentService = new PaymentService();
     return $paymentService->test();
 });
+
+Route::prefix('nft')->group(function () {
+    Route::get('/category/{idCategory}', [NftController::class, 'getByCategory']);
+})->middleware(['auth:sanctum']);

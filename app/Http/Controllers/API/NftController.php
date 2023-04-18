@@ -55,4 +55,10 @@ class NftController extends Controller
         }
         return response()->json(['data' => $nft]);
     }
+
+    public function getByCategory(int $idCategory)
+    {
+        $nfts = $this->nftService->getByCategory($idCategory);
+        return response()->json($nfts);
+    }
 }

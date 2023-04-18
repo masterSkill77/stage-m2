@@ -42,4 +42,9 @@ class NftService
     {
         return Nft::with(['category', 'owner'])->where('id', $idNft)->first();
     }
+
+    public function getbyCategory(int $idCategory)
+    {
+        return Nft::with(['category'])->where('category_id', $idCategory)->get();
+    }
 }
