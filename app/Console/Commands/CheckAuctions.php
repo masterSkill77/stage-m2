@@ -32,6 +32,7 @@ class CheckAuctions extends Command
 
     public function __construct(public BlockchainService $blockchainService)
     {
+        parent::__construct();
     }
     /**
      * Execute the console command.
