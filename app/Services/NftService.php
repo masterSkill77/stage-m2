@@ -14,11 +14,12 @@ class NftService
     {
         return Nft::with(['category', 'owner'])->paginate($perPage);
     }
-    public function store(array $data, int $userId)
+    public function store(array $data, User $user)
     {
-        $data['owner_id'] = $userId;
+
+        $data['owner_id'] = $user->id;
         $nft = new Nft($data);
-        $blockchainNft = $this->blockchainService->createNftOnBlockchain($data);
+        $blockchainNft = $this->blockchainService->createNftOnBlockchain($data, $user);
         $nft->token_id = ($blockchainNft['tokenId']);
         $nft->save();
         return $nft;

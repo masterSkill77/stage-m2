@@ -27,7 +27,7 @@ class NftController extends Controller
     public function store(CreateNftRequest $request): JsonResponse | null
     {
         $user = auth()->user();
-        $nft = $this->nftService->store($request->toArray(), $user->id);
+        $nft = $this->nftService->store($request->toArray(), $user);
 
         return response()->json(['data' => $nft], Response::HTTP_CREATED);
     }

@@ -7,6 +7,7 @@ use App\Models\Auction;
 use App\Models\Bid;
 use App\Models\Nft;
 use App\Models\User;
+use App\Services\BlockchainService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +29,10 @@ class CheckAuctions extends Command
      */
     protected $description = 'Check auctions that have ended and notify winners.';
 
+
+    public function __construct(public BlockchainService $blockchainService)
+    {
+    }
     /**
      * Execute the console command.
      */
@@ -49,8 +54,11 @@ class CheckAuctions extends Command
 
                 if ($highestBid) {
                     $winner = User::find($highestBid->bidder_id);
+                    $owner = User::find($auction->owner_id);
+                    $nft = Nft::find($auction->nft_id);
                     Nft::where('id', $auction->nft_id)->update(['owner_id' => $winner->id]);
                     Auction::where('id', $auction->id)->update(['winner_id' => $winner->id]);
+                    $this->blockchainService->transfertNftOnBlockchain($owner, $winner, $nft);
                     Mail::to($winner->email)->send(new AuctionWinner($auction, $winner));
                 }
             }
