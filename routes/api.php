@@ -5,6 +5,7 @@ use App\Http\Controllers\API\BidController;
 use App\Http\Controllers\API\NftController;
 use App\Http\Controllers\API\TransfertController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\NewsController;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,3 +59,5 @@ Route::get('/test-paypal', function () {
 Route::prefix('nft')->group(function () {
     Route::get('/category/{idCategory}', [NftController::class, 'getByCategory']);
 })->middleware(['auth:sanctum']);
+
+Route::get('news', [NewsController::class, 'index']);
