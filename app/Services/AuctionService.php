@@ -20,7 +20,7 @@ class AuctionService
     }
     public function getAuction(int $auctionId): Auction | null
     {
-        return Auction::with(['nft', 'owner', 'bids'])->where('id', $auctionId)->first();
+        return Auction::with(['nft', 'owner', 'bids', 'bids.bidder'])->where('id', $auctionId)->first();
     }
 
     public function changeCurrentBid(Auction $auction, float $bid)
