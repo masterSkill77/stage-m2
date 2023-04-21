@@ -12,6 +12,7 @@ use App\Services\BlockchainService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class CheckAuctions extends Command
@@ -63,11 +64,16 @@ class CheckAuctions extends Command
                     $this->blockchainService->transfertNftOnBlockchain($owner, $winner, $nft);
                     Mail::to($winner->email)->send(new AuctionWinner($auction, $winner));
                 }
-                event(new AuctionDone('auction done'));
+                try {
+                    event(new AuctionDone('auction done'));
+                } catch (Exception $e) {
+                    Log::debug($e);
+                }
             }
             DB::commit();
             $this->info(count($endedAuctions) . ' auctions marked as ended.');
         } catch (Exception $e) {
+            Log::debug($e);
             DB::rollBack();
         };
     }
