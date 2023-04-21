@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Events\AuctionDone;
 use App\Mail\AuctionWinner;
 use App\Models\Auction;
 use App\Models\Bid;
@@ -62,6 +63,7 @@ class CheckAuctions extends Command
                     $this->blockchainService->transfertNftOnBlockchain($owner, $winner, $nft);
                     Mail::to($winner->email)->send(new AuctionWinner($auction, $winner));
                 }
+                event(new AuctionDone('auction done'));
             }
             DB::commit();
             $this->info(count($endedAuctions) . ' auctions marked as ended.');
