@@ -51,4 +51,8 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Nft::class, 'owner_id');
     }
+    public function configuration()
+    {
+        return $this->hasOne(Configuration::class, 'user_id');
+    }
 }
