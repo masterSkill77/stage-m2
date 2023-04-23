@@ -52,7 +52,11 @@ class AuctionController extends Controller
         }
         return response()->json(['data' => $auction]);
     }
-
+    public function showMyAuctions()
+    {
+        $allAuctions = $this->auctionService->myAuctions(auth()->user()->id);
+        return response()->json(['data' => $allAuctions]);
+    }
     /**
      * Update the specified resource in storage.
      */

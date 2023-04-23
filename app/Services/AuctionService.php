@@ -29,4 +29,11 @@ class AuctionService
         $auction->save();
         return $auction;
     }
+    public function myAuctions($userId)
+    {
+        $ownAuctions =  Auction::with(['nft', 'owner', 'bids', 'bids.bidder'])->where('owner_id', $userId)->get();
+        $winAuctions =  Auction::with(['nft', 'owner', 'bids', 'bids.bidder'])->where('winner_id', $userId)->get();
+
+        return ['win_auctions' => $winAuctions, 'own_auctions' => $ownAuctions];
+    }
 }

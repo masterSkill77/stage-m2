@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Auction;
 use App\Models\User;
 use App\Models\UserConfig;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PaymentService
 {
@@ -15,25 +17,29 @@ class PaymentService
       env('STRIPE_SECRET')
     );
   }
-  public function paiement(User $user)
+  public function paiement(User $user, Auction $auction)
   {
     $config = UserConfig::where('user_id', $user->id)->first();
-    return $config;
-    // $token = $this->stripe->tokens->create([
-    //   'card' => [
-    //     'number' => '4242424242424242',
-    //     'exp_month' => 12,
-    //     'exp_year' => 2025,
-    //     'cvc' => '123',
-    //   ],
-    // ]);
-    // $charge = $this->stripe->charges->create([
-    //   'amount' => 500 * 100,
-    //   'currency' => 'usd',
-    //   'source' => $token->id,
-    //   'description' => 'Paiement pour l\'enchère #123',
-    // ]);
+    if ($config) {
 
-    // return $charge;
+      $token = $this->stripe->tokens->create([
+        'card' => [
+          'number' => $config->card_number,
+          'exp_month' => $config->card_expires_month,
+          'exp_year' => $config->card_expires_year,
+          'cvc' => $config->cvc,
+        ],
+      ]);
+      $charge = $this->stripe->charges->create([
+        'amount' => $auction->current_bid * 100,
+        'currency' => 'usd',
+        'source' => $token->id,
+        'description' => 'Paiement pour l\'enchère #123',
+      ]);
+
+      return $charge;
+    } else {
+      throw new NotFoundHttpException('config not found');
+    }
   }
 }
