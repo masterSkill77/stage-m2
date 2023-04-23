@@ -58,10 +58,10 @@ class CheckAuctions extends Command
                 if ($highestBid) {
                     $winner = User::find($highestBid->bidder_id);
                     $owner = User::find($auction->owner_id);
-                    $nft = Nft::find($auction->nft_id);
-                    Nft::where('id', $auction->nft_id)->update(['owner_id' => $winner->id]);
+                    // $nft = Nft::find($auction->nft_id);
+                    // Nft::where('id', $auction->nft_id)->update(['owner_id' => $winner->id]);
                     Auction::where('id', $auction->id)->update(['winner_id' => $winner->id]);
-                    $this->blockchainService->transfertNftOnBlockchain($owner, $winner, $nft);
+                    // $this->blockchainService->transfertNftOnBlockchain($owner, $winner, $nft);
                     Mail::to($winner->email)->send(new AuctionWinner($auction, $winner));
                 }
                 try {
