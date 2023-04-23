@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\AuctionController;
 use App\Http\Controllers\API\BidController;
 use App\Http\Controllers\API\NftController;
+use App\Http\Controllers\API\PaiementController;
 use App\Http\Controllers\API\TransfertController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NewsController;
@@ -51,9 +52,8 @@ Route::prefix('transfert')->middleware('auth:sanctum')->group(function () {
 });
 
 
-Route::get('/test-paypal', function () {
-    $paymentService = new PaymentService();
-    return $paymentService->test();
+Route::prefix('/paiement')->group(function () {
+    Route::post('/', [PaiementController::class, 'paiement']);
 });
 
 Route::prefix('nft')->group(function () {
