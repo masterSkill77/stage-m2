@@ -52,12 +52,12 @@ Route::prefix('transfert')->middleware('auth:sanctum')->group(function () {
 });
 
 
-Route::prefix('/paiement')->group(function () {
+Route::prefix('/paiement')->middleware(['auth:sanctum'])->group(function () {
     Route::post('/', [PaiementController::class, 'paiement']);
 });
 
-Route::prefix('nft')->group(function () {
+Route::prefix('nft')->middleware(['auth:sanctum'])->group(function () {
     Route::get('/category/{idCategory}', [NftController::class, 'getByCategory']);
-})->middleware(['auth:sanctum']);
+});
 
 Route::get('news', [NewsController::class, 'index']);
