@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('profile_image');
             $table->string('card_number');
-            $table->string('card_expires');
+            $table->string('card_expires_month');
+            $table->string('card_expires_year');
             $table->string('cvc')->max('3');
 
             $table->unsignedBigInteger('user_id');

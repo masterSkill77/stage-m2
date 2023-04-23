@@ -14,7 +14,7 @@ class PaiementController extends Controller
 
     public function paiement(Request $request)
     {
-        $paiement = $this->paiementService->paiement();
+        $paiement = $this->paiementService->paiement(auth()->user());
         return response()->json($paiement);
     }
 }

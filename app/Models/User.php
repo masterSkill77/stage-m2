@@ -53,6 +53,6 @@ class User extends Authenticatable implements MustVerifyEmail
     }
     public function configuration()
     {
-        return $this->hasOne(Configuration::class, 'user_id');
+        return $this->hasOne(UserConfig::class, 'user_id');
     }
 }

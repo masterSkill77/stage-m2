@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\User;
+use App\Models\UserConfig;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 class PaymentService
@@ -13,23 +15,25 @@ class PaymentService
       env('STRIPE_SECRET')
     );
   }
-  public function paiement()
+  public function paiement(User $user)
   {
-    $token = $this->stripe->tokens->create([
-      'card' => [
-        'number' => '4242424242424242',
-        'exp_month' => 12,
-        'exp_year' => 2025,
-        'cvc' => '123',
-      ],
-    ]);
-    $charge = $this->stripe->charges->create([
-      'amount' => 500 * 100,
-      'currency' => 'usd',
-      'source' => $token->id,
-      'description' => 'Paiement pour l\'enchère #123',
-    ]);
+    $config = UserConfig::where('user_id', $user->id)->first();
+    return $config;
+    // $token = $this->stripe->tokens->create([
+    //   'card' => [
+    //     'number' => '4242424242424242',
+    //     'exp_month' => 12,
+    //     'exp_year' => 2025,
+    //     'cvc' => '123',
+    //   ],
+    // ]);
+    // $charge = $this->stripe->charges->create([
+    //   'amount' => 500 * 100,
+    //   'currency' => 'usd',
+    //   'source' => $token->id,
+    //   'description' => 'Paiement pour l\'enchère #123',
+    // ]);
 
-    return $charge;
+    // return $charge;
   }
 }
