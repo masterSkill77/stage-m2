@@ -47,6 +47,7 @@ Route::get('verify/{userId}/{token}', [AuthController::class, 'verifyMail']);
 
 Route::prefix('/mine')->middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('nft', [NftController::class, 'mine']);
+    Route::get('nft/available', [NftController::class, 'myAvailableNfts']);
     Route::get('/auctions', [AuctionController::class, 'showMyAuctions']);
 });
 

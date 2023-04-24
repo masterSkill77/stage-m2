@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Nft;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class NftService
 {
@@ -52,5 +53,16 @@ class NftService
     public function getbyCategory(int $idCategory)
     {
         return Nft::with(['category'])->where('category_id', $idCategory)->get();
+    }
+
+    public function getMyAvailableNft($userId)
+    {
+        return DB::table('nfts')
+            ->where('owner_id', $userId)
+            ->whereNotIn('id', function ($query) {
+                $query->select('nft_id')
+                    ->from('auctions');
+            })
+            ->get();
     }
 }

@@ -47,6 +47,13 @@ class NftController extends Controller
         $myNfts = $this->nftService->myNfts($userId, $perPage);
         return response()->json(['data' => $myNfts]);
     }
+
+    public function myAvailableNfts()
+    {
+        $userId = auth()->user()->id;
+        $myNfts = $this->nftService->getMyAvailableNft($userId);
+        return response()->json(['data' => $myNfts]);
+    }
     public function show(int $nftId)
     {
         $nft = $this->nftService->getNft($nftId);

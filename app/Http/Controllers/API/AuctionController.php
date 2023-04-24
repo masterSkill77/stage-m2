@@ -44,7 +44,7 @@ class AuctionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id)
+    public function show(string $id)
     {
         $auction = $this->auctionService->getAuction($id);
         if (!$auction) {

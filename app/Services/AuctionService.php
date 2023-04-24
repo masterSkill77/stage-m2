@@ -4,11 +4,13 @@ namespace App\Services;
 
 use App\Models\Auction;
 use App\Models\Nft;
+use Illuminate\Support\Str;
 
 class AuctionService
 {
     public function store(array $data)
     {
+        $data['auction_uuid'] = Str::uuid();
         $auction = new Auction($data);
         $auction->save();
 
@@ -18,9 +20,9 @@ class AuctionService
     {
         return Auction::with(['nft', 'owner', 'bids'])->where('status', 0)->paginate($perPage);
     }
-    public function getAuction(int $auctionId): Auction | null
+    public function getAuction(string $auctionId): Auction | null
     {
-        return Auction::with(['nft', 'owner', 'bids', 'bids.bidder'])->where('id', $auctionId)->first();
+        return Auction::with(['nft', 'owner', 'bids', 'bids.bidder'])->where('auction_uuid', $auctionId)->first();
     }
 
     public function changeCurrentBid(Auction $auction, float $bid)

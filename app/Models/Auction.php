@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Auction extends Model
 {
     use HasFactory;
-    protected $fillable = ['end_date', 'start_date', 'current_bid', 'start_price', 'owner_id', 'nft_id'];
+    protected $fillable = ['end_date', 'start_date', 'current_bid', 'start_price', 'owner_id', 'nft_id', 'auction_uuid'];
 
     public function owner(): BelongsTo
     {
