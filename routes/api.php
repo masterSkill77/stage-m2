@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuctionController;
 use App\Http\Controllers\API\BidController;
+use App\Http\Controllers\API\FormController;
 use App\Http\Controllers\API\NftController;
 use App\Http\Controllers\API\PaiementController;
 use App\Http\Controllers\API\TransfertController;
@@ -31,7 +32,8 @@ Route::apiResources(
     [
         'nft' => NftController::class,
         'auction' => AuctionController::class,
-        'bid' => BidController::class
+        'bid' => BidController::class,
+        'form' => FormController::class
     ],
     [
         'middleware' => ['auth:sanctum']
