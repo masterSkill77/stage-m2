@@ -18,7 +18,7 @@ class AuctionService
     }
     public function lists(int | null $perPage = 1)
     {
-        return Auction::with(['nft', 'owner', 'bids'])->where('status', 0)->paginate($perPage);
+        return Auction::with(['nft', 'owner', 'bids'])->where('status', 0)->orderBy('created_at', 'DESC')->paginate($perPage);
     }
     public function getAuction(string $auctionId): Auction | null
     {
@@ -33,8 +33,8 @@ class AuctionService
     }
     public function myAuctions($userId)
     {
-        $ownAuctions =  Auction::with(['nft', 'owner', 'bids', 'bids.bidder'])->where('owner_id', $userId)->get();
-        $winAuctions =  Auction::with(['nft', 'owner', 'bids', 'bids.bidder'])->where('winner_id', $userId)->get();
+        $ownAuctions =  Auction::with(['nft', 'owner', 'bids', 'bids.bidder'])->where('owner_id', $userId)->orderBy('created_at', 'DESC')->get();
+        $winAuctions =  Auction::with(['nft', 'owner', 'bids', 'bids.bidder'])->where('winner_id', $userId)->orderBy('created_at', 'DESC')->get();
 
         return ['win_auctions' => $winAuctions, 'own_auctions' => $ownAuctions];
     }
