@@ -43,6 +43,11 @@ class NftService
         $newOwner = User::findOrFail($newOwner);
         $oldOwner = User::findOrFail($oldOwner);
         $nft = Nft::findOrFail($nft);
+
+        $nft->owner()->associate($newOwner->id);
+        $nft->save();
+
+        return $nft;
     }
 
     public function getNft($idNft)

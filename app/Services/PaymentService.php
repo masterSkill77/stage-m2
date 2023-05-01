@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Jobs\ProcessChargeJob;
 use App\Models\Auction;
+use App\Models\Nft;
 use App\Models\User;
 use App\Models\UserConfig;
-use Srmklive\PayPal\Services\PayPal as PayPalClient;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PaymentService
@@ -21,12 +21,17 @@ class PaymentService
   public function paiement(User $user, Auction $auction)
   {
     $config = UserConfig::where('user_id', $user->id)->first();
+    $fromUser = User::find($auction->owner_id)->first();
+    $nft = Nft::where('id', $auction->nft_id)->first();
+
 
     if ($config) {
       $job = new ProcessChargeJob($auction, $this->stripe, $config);
 
       (new AuctionService)->pay($auction);
       dispatch($job);
+      (new BlockchainService)->transfertNftOnBlockchain($fromUser, $user, $nft);
+      (new NftService(new BlockchainService))->affectNft($user->id, $fromUser->id, $auction->nft_id);
       return $auction;
     } else {
       throw new NotFoundHttpException('config not found');
