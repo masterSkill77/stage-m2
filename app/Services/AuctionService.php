@@ -38,4 +38,11 @@ class AuctionService
 
         return ['win_auctions' => $winAuctions, 'own_auctions' => $ownAuctions];
     }
+
+    public function pay(Auction $auction)
+    {
+        $auction->is_paid = 1;
+        $auction->save();
+        return $auction;
+    }
 }
