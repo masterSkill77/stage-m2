@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\ProcessChargeJob;
 use App\Models\Auction;
 use App\Models\User;
 use App\Models\UserConfig;
@@ -20,24 +21,13 @@ class PaymentService
   public function paiement(User $user, Auction $auction)
   {
     $config = UserConfig::where('user_id', $user->id)->first();
+
     if ($config) {
+      $job = new ProcessChargeJob($auction, $this->stripe, $config);
 
-      $token = $this->stripe->tokens->create([
-        'card' => [
-          'number' => $config->card_number,
-          'exp_month' => $config->card_expires_month,
-          'exp_year' => $config->card_expires_year,
-          'cvc' => $config->cvc,
-        ],
-      ]);
-      $charge = $this->stripe->charges->create([
-        'amount' => $auction->current_bid * 100,
-        'currency' => 'usd',
-        'source' => $token->id,
-        'description' => 'Paiement pour l\'enchère #123',
-      ]);
-
-      return $charge;
+      (new AuctionService)->pay($auction);
+      dispatch($job);
+      return $auction;
     } else {
       throw new NotFoundHttpException('config not found');
     }
