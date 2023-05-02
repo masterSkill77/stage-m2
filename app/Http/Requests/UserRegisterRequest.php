@@ -30,7 +30,11 @@ class UserRegisterRequest extends FormRequest
             'password' => 'required',
             'lastname' => 'required',
             'username' => 'required',
-            'etherum_adress' => 'required'
+            'etherum_adress' => 'required',
+            'profile_image' => 'string',
+            'card_number' => 'required',
+            'card_expires_month' => 'reqiured',
+            'cvc' => 'required'
         ];
     }
 
