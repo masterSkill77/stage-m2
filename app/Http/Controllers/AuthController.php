@@ -29,7 +29,7 @@ class AuthController extends Controller
         $email = $request->input('email');
         $password = $request->input('password');
         if (Auth::attempt(['email' => $email, 'password' => $password])) {
-            $user = User::where('email', $email)->first();
+            $user = User::where('email', $email)->with('configuration')->first();
             $token = $user->createToken(env('SECRET_TOKEN', 'test_token'));
 
             return response()->json(['user' => $user, 'access_token' => $token->plainTextToken]);
