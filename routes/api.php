@@ -29,12 +29,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::apiResource('form', FormController::class);
+
 Route::apiResources(
     [
         'nft' => NftController::class,
         'auction' => AuctionController::class,
         'bid' => BidController::class,
-        'form' => FormController::class
     ],
     [
         'middleware' => ['auth:sanctum']

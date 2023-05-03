@@ -42,6 +42,7 @@ class UserService
     {
         $user = User::findOrFail($userId);
         $user->email_verified_at = now();
+        $user->save();
         return $user;
     }
 }
