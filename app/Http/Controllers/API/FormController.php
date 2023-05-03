@@ -25,4 +25,8 @@ class FormController extends Controller
         $form->save();
         return response()->json($form, Response::HTTP_OK);
     }
+    public function show(Form $form)
+    {
+        return response()->json($form);
+    }
 }
