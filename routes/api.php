@@ -8,6 +8,7 @@ use App\Http\Controllers\API\PaiementController;
 use App\Http\Controllers\API\TransfertController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NewsController;
+use App\Models\User;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -65,3 +66,9 @@ Route::prefix('nft')->middleware(['auth:sanctum'])->group(function () {
 });
 
 Route::get('news', [NewsController::class, 'index']);
+
+
+Route::get('/check-exists/{emailOrUsername}', function ($emailOrUsername) {
+    $exists =  User::where('email', $emailOrUsername)->orWhere('username', $emailOrUsername)->get();
+    return count($exists) != 0 ? 1 : 0;
+});

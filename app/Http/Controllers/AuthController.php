@@ -40,6 +40,6 @@ class AuthController extends Controller
     public function verifyMail($userId, $token)
     {
         $user = $this->userService->verifyEmail($userId, $token);
-        return response()->json(['user' => $user, 'token' => $token]);
+        return response()->redirectTo(env('URL_CLIENT') . '/login');
     }
 }
