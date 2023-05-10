@@ -11,15 +11,16 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class AuctionDone implements ShouldBroadcastNow
+class BidPlaced implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(public $message)
+    public function __construct()
     {
+        //
     }
 
     /**
@@ -30,11 +31,11 @@ class AuctionDone implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new Channel('auction'),
+            new Channel('bid'),
         ];
     }
     public function broadcastAs()
     {
-        return 'auction-done';
+        return 'bid-placed';
     }
 }

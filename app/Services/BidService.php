@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\BidPlaced;
 use App\Exceptions\BidTooLowException;
 use App\Models\Bid;
 use App\Notifications\NewBidNotification;
@@ -29,6 +30,7 @@ class BidService
                 foreach ($toNotify as $user)
                     $user->bidder->notify(new NewBidNotification($auction, $user->bidder));
                 DB::commit();
+                event(new BidPlaced());
                 return $bid;
             } catch (Exception $e) {
                 DB::rollBack();
