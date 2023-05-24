@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\UserRegisterRequest;
 use App\Models\User;
 use App\Services\UserService;
@@ -41,5 +42,10 @@ class AuthController extends Controller
     {
         $user = $this->userService->verifyEmail($userId, $token);
         return response()->redirectTo(env('URL_CLIENT') . '/login');
+    }
+
+    public function updateProfile(UpdateProfileRequest $request, $userId)
+    {
+        return $request->all();
     }
 }

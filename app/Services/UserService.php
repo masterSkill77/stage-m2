@@ -12,6 +12,30 @@ use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
+    public function updateProfile(array $data, $userId)
+    {
+        return DB::transaction(function () use ($data, $userId) {
+            try {
+                $user = User::findOrFail($userId);
+                $$data['password'] = Hash::make($data['password']);
+
+                $user->fill($data);
+                $user->save();
+                if (is_array($data['profile_image']))
+                    $data['profile_image'] = ($data['profile_image'][0]['content']);
+                else
+                    $data['profile_image'] = ($data['profile_image']);
+                $config = UserConfig::where('user_id', $userId)->first();
+                $config->fill($data);
+                $config->save();
+                DB::commit();
+                return ['user' => $user];
+            } catch (Exception $e) {
+                DB::rollBack();
+                throw new Error($e->getMessage());
+            }
+        });
+    }
     public function register(array $data)
     {
 

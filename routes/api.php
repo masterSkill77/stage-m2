@@ -30,6 +30,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::apiResource('form', FormController::class);
+Route::put('/profile/{id}', [AuthController::class, 'updateProfile'])->middleware('auth:sanctum');
+
 
 Route::apiResources(
     [

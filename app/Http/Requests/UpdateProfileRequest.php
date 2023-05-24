@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\HttpFoundation\Response;
 
-class UserRegisterRequest extends FormRequest
+class UpdateProfileRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,12 +26,10 @@ class UserRegisterRequest extends FormRequest
     {
         return [
             'name' => 'string',
-            'email' => 'email|required',
             'password' => 'required',
             'lastname' => 'required',
-            'username' => 'required',
             'etherum_adress' => 'required',
-            'profile_image' => 'array',
+            'profile_image',
             'card_number' => 'required',
             'card_expires_month' => 'required',
             'card_expires_year' => 'required',

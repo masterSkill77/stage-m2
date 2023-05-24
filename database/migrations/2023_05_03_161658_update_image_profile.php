@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_configs', function (Blueprint $table) {
-            $table->text('profile_image')->change();
+            $table->longText('profile_image')->change();
         });
     }
 
