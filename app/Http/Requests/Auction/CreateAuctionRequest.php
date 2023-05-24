@@ -24,7 +24,7 @@ class CreateAuctionRequest extends FormRequest
      */
     public function rules(): array
     {
-        return ['end_date' => 'bail|required', 'start_date' => 'required', 'current_bid', 'start_price' => 'numeric', 'nft_id' => 'required', 'type'];
+        return ['end_date' => 'bail|required', 'start_date' => 'required', 'current_bid', 'start_price' => 'numeric', 'nft_id' => 'required'];
     }
     protected function failedValidation(Validator $validator)
     {
