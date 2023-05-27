@@ -55,4 +55,8 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(UserConfig::class, 'user_id');
     }
+    public function pack()
+    {
+        return $this->belongsTo(Pack::class, 'pack_id');
+    }
 }

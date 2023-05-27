@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AuctionController;
 use App\Http\Controllers\API\BidController;
 use App\Http\Controllers\API\FormController;
 use App\Http\Controllers\API\NftController;
+use App\Http\Controllers\API\PackController;
 use App\Http\Controllers\API\PaiementController;
 use App\Http\Controllers\API\TransfertController;
 use App\Http\Controllers\AuthController;
@@ -63,6 +64,8 @@ Route::prefix('transfert')->middleware('auth:sanctum')->group(function () {
 Route::prefix('/paiement')->middleware(['auth:sanctum'])->group(function () {
     Route::post('/', [PaiementController::class, 'paiement']);
 });
+
+Route::apiResource('pack', PackController::class);
 
 Route::prefix('nft')->middleware(['auth:sanctum'])->group(function () {
     Route::get('/category/{idCategory}', [NftController::class, 'getByCategory']);
