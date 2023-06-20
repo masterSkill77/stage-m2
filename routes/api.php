@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -77,4 +78,12 @@ Route::get('news', [NewsController::class, 'index']);
 Route::get('/check-exists/{emailOrUsername}', function ($emailOrUsername) {
     $exists =  User::where('email', $emailOrUsername)->orWhere('username', $emailOrUsername)->get();
     return count($exists) != 0 ? 1 : 0;
+});
+
+
+Route::get("ticker", function () {
+    $response = Http::get('https://api.binance.com/api/v3/ticker/24hr');
+    $array_response = array_slice([...$response->json()], 0, 10);
+
+    return $array_response;
 });
