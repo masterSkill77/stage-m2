@@ -23,6 +23,5 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pack_for_user');
     }
 };
