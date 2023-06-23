@@ -44,7 +44,7 @@ class AuctionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id)
+    public function show(string $id)
     {
         $auction = $this->auctionService->getAuction($id);
         if (!$auction) {
@@ -52,7 +52,11 @@ class AuctionController extends Controller
         }
         return response()->json(['data' => $auction]);
     }
-
+    public function showMyAuctions()
+    {
+        $allAuctions = $this->auctionService->myAuctions(auth()->user()->id);
+        return response()->json(['data' => $allAuctions]);
+    }
     /**
      * Update the specified resource in storage.
      */

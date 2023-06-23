@@ -27,7 +27,7 @@ class NftController extends Controller
     public function store(CreateNftRequest $request): JsonResponse | null
     {
         $user = auth()->user();
-        $nft = $this->nftService->store($request->toArray(), $user->id);
+        $nft = $this->nftService->store($request->toArray(), $user);
 
         return response()->json(['data' => $nft], Response::HTTP_CREATED);
     }
@@ -47,6 +47,13 @@ class NftController extends Controller
         $myNfts = $this->nftService->myNfts($userId, $perPage);
         return response()->json(['data' => $myNfts]);
     }
+
+    public function myAvailableNfts()
+    {
+        $userId = auth()->user()->id;
+        $myNfts = $this->nftService->getMyAvailableNft($userId);
+        return response()->json(['data' => $myNfts]);
+    }
     public function show(int $nftId)
     {
         $nft = $this->nftService->getNft($nftId);
@@ -54,5 +61,11 @@ class NftController extends Controller
             return response()->json(['message' => 'NFT_NO_FOUND'], Response::HTTP_NOT_FOUND);
         }
         return response()->json(['data' => $nft]);
+    }
+
+    public function getByCategory(int $idCategory)
+    {
+        $nfts = $this->nftService->getByCategory($idCategory);
+        return response()->json($nfts);
     }
 }

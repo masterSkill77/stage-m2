@@ -12,6 +12,7 @@ class TransfertController extends Controller
 {
     public function transfert(TransfertNftRequest $request)
     {
+        
         return response()->json();
     }
 }

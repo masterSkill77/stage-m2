@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('configuration_payments', function (Blueprint $table) {
+        Schema::create('user_configs', function (Blueprint $table) {
             $table->id();
-            $table->string('payment_method', 50);
-            $table->string('payment_number');
-            $table->boolean('default')->default(false);
+            $table->string('profile_image');
+            $table->string('card_number');
+            $table->string('card_expires_month');
+            $table->string('card_expires_year');
+            $table->string('cvc')->max('3');
 
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('configuation_payments');
+        Schema::dropIfExists('user_configs');
     }
 };

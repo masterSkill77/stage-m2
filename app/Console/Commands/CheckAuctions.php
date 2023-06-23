@@ -2,13 +2,17 @@
 
 namespace App\Console\Commands;
 
+use App\Events\AuctionDone;
 use App\Mail\AuctionWinner;
 use App\Models\Auction;
 use App\Models\Bid;
+use App\Models\Nft;
 use App\Models\User;
+use App\Services\BlockchainService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class CheckAuctions extends Command
@@ -27,6 +31,11 @@ class CheckAuctions extends Command
      */
     protected $description = 'Check auctions that have ended and notify winners.';
 
+
+    public function __construct(public BlockchainService $blockchainService)
+    {
+        parent::__construct();
+    }
     /**
      * Execute the console command.
      */
@@ -48,13 +57,23 @@ class CheckAuctions extends Command
 
                 if ($highestBid) {
                     $winner = User::find($highestBid->bidder_id);
+                    $owner = User::find($auction->owner_id);
+                    // $nft = Nft::find($auction->nft_id);
+                    // Nft::where('id', $auction->nft_id)->update(['owner_id' => $winner->id]);
                     Auction::where('id', $auction->id)->update(['winner_id' => $winner->id]);
+                    // $this->blockchainService->transfertNftOnBlockchain($owner, $winner, $nft);
                     Mail::to($winner->email)->send(new AuctionWinner($auction, $winner));
+                }
+                try {
+                    event(new AuctionDone('auction done'));
+                } catch (Exception $e) {
+                    Log::debug($e);
                 }
             }
             DB::commit();
             $this->info(count($endedAuctions) . ' auctions marked as ended.');
         } catch (Exception $e) {
+            Log::debug($e);
             DB::rollBack();
         };
     }

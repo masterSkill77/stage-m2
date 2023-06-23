@@ -23,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'etherum_adress',
         'lastname',
         'username'
     ];
@@ -49,5 +50,13 @@ class User extends Authenticatable implements MustVerifyEmail
     public function nfts()
     {
         return $this->hasMany(Nft::class, 'owner_id');
+    }
+    public function configuration()
+    {
+        return $this->hasOne(UserConfig::class, 'user_id');
+    }
+    public function pack()
+    {
+        return $this->belongsTo(Pack::class, 'pack_id');
     }
 }

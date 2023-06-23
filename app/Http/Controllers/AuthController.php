@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\UserRegisterRequest;
 use App\Models\User;
 use App\Services\UserService;
@@ -29,7 +30,7 @@ class AuthController extends Controller
         $email = $request->input('email');
         $password = $request->input('password');
         if (Auth::attempt(['email' => $email, 'password' => $password])) {
-            $user = User::where('email', $email)->first();
+            $user = User::where('email', $email)->with('configuration', 'pack')->first();
             $token = $user->createToken(env('SECRET_TOKEN', 'test_token'));
 
             return response()->json(['user' => $user, 'access_token' => $token->plainTextToken]);
@@ -40,6 +41,11 @@ class AuthController extends Controller
     public function verifyMail($userId, $token)
     {
         $user = $this->userService->verifyEmail($userId, $token);
-        return response()->json(['user' => $user, 'token' => $token]);
+        return response()->redirectTo(env('URL_CLIENT') . '/login');
+    }
+
+    public function updateProfile(UpdateProfileRequest $request, $userId)
+    {
+        return $request->all();
     }
 }
