@@ -5,13 +5,14 @@ namespace App\Services;
 use App\Events\BidPlaced;
 use App\Exceptions\BidTooLowException;
 use App\Models\Bid;
+use App\Models\User;
 use App\Notifications\NewBidNotification;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
 class BidService
 {
-    public function __construct(public AuctionService $auctionService)
+    public function __construct(public AuctionService $auctionService, public PackForUserService $packForUserService)
     {
     }
     public function makeBid(array $data)
@@ -27,6 +28,9 @@ class BidService
                 $bid->save();
                 $this->auctionService->changeCurrentBid($auction, $data['bid_amount']);
                 $toNotify = $this->getAllBidderExceptMaker($auction->id, $data['bidder_id']);
+
+                $user = User::find($data['bidder_id']);
+                $this->packForUserService->bided($user);
                 foreach ($toNotify as $user)
                     $user->bidder->notify(new NewBidNotification($auction, $user->bidder));
                 DB::commit();
@@ -41,7 +45,7 @@ class BidService
 
     /**
      * Retourne la liste de ceux qui ont fait un bid excepté celui qui a fait le dernier bid
-     *  
+     *
      */
     public function getAllBidderExceptMaker($auctionId, $exceptBidderId)
     {

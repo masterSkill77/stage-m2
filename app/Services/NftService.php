@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class NftService
 {
-    public function __construct(public BlockchainService $blockchainService)
+    public function __construct(public BlockchainService $blockchainService, public PackForUserService $packForUserService)
     {
     }
     public function lists(int | null $perPage = 1)
@@ -23,6 +23,7 @@ class NftService
         $blockchainNft = $this->blockchainService->createNftOnBlockchain($data, $user);
         $nft->token_id = ($blockchainNft['tokenId']);
         $nft->save();
+        $this->packForUserService->nfted($user);
         return $nft;
     }
     public function myNfts(int $userId, int | null $perPage = 1)

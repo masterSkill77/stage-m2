@@ -7,12 +7,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auction\CreateAuctionRequest;
 use App\Services\AuctionService;
 use App\Services\NftService;
+use App\Services\PackForUserService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AuctionController extends Controller
 {
-    public function __construct(public AuctionService $auctionService, public NftService $nftService)
+    public function __construct(public AuctionService $auctionService, public NftService $nftService, public PackForUserService $packForUserService)
     {
     }
     /**
@@ -37,7 +38,7 @@ class AuctionController extends Controller
         $request['owner_id'] = $user->id;
         $request['current_bid'] = $request['current_bid'] ?? 0;
         $auction = $this->auctionService->store($request->toArray());
-
+        $value = $this->packForUserService->auctioned($user);
         return response()->json(['data' => $auction]);
     }
 
