@@ -25,7 +25,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'etherum_adress',
         'lastname',
-        'username'
+        'username',
+        'current_allow_bid',
+        'current_allow_auction',
+        'current_allow_nft',
     ];
 
     /**
