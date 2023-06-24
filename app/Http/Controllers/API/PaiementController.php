@@ -19,4 +19,11 @@ class PaiementController extends Controller
         $paiement = $this->paiementService->paiement(auth()->user(), $auction);
         return response()->json($paiement);
     }
+
+    public function upgradePack(Request $request)
+    {
+        $user = auth()->user();
+        $paiement = $this->paiementService->upgradePack($user, $request->input('packId'));
+        return response()->json($paiement);
+    }
 }

@@ -56,6 +56,7 @@ Route::prefix('transfert')->middleware('auth:sanctum')->group(function () {
 
 Route::prefix('/paiement')->middleware(['auth:sanctum'])->group(function () {
     Route::post('/', [PaiementController::class, 'paiement']);
+    Route::post('/upgrade-pack', [PaiementController::class, 'upgradePack']);
 });
 
 Route::apiResource('pack', PackController::class);
