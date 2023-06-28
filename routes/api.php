@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuctionController;
 use App\Http\Controllers\API\BidController;
+use App\Http\Controllers\API\ContactController;
 use App\Http\Controllers\API\FormController;
 use App\Http\Controllers\API\NftController;
 use App\Http\Controllers\API\PackController;
@@ -10,9 +11,7 @@ use App\Http\Controllers\API\TransfertController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NewsController;
 use App\Models\User;
-use App\Services\PaymentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
@@ -82,4 +81,14 @@ Route::get("ticker", function () {
     $array_response = array_slice([...$response->json()], 0, 10);
 
     return $array_response;
+});
+
+Route::middleware('auth:sanctum')->prefix('users')->group(function () {
+    Route::get("/info/{user}", function (Request $request, User $user) {
+        $user = User::with("configuration")->where("id", $user->id)->first();
+        return response()->json($user);
+    });
+
+    Route::apiResource("/friends", ContactController::class);
+    Route::post("/notation", []);
 });
