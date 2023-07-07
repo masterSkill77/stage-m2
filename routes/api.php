@@ -11,6 +11,7 @@ use App\Http\Controllers\API\TransfertController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NewsController;
 use App\Models\User;
+use App\Services\TickerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
@@ -77,10 +78,10 @@ Route::get('/check-exists/{emailOrUsername}', function ($emailOrUsername) {
 
 
 Route::get("ticker", function () {
-    $response = Http::get('https://api.binance.com/api/v3/ticker/24hr');
-    $array_response = array_slice([...$response->json()], 0, 10);
 
-    return $array_response;
+    $tickerService = new TickerService();
+    $response = $tickerService->show();
+    return response()->json($response);
 });
 
 Route::middleware('auth:sanctum')->prefix('users')->group(function () {
