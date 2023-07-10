@@ -46,7 +46,7 @@ class UserService
 
                 $user = new User($data);
                 $user->save();
-                $data['profile_image'] = ($data['profile_image'][0]['content']);
+                $data['profile_image'] = ($data['profile_image']);
 
                 $config = new UserConfig($data);
                 $config->user_id = $user->id;
