@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\EmailNotVerifiedException;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\UserRegisterRequest;
 use App\Models\User;
@@ -31,6 +32,9 @@ class AuthController extends Controller
         $password = $request->input('password');
         if (Auth::attempt(['email' => $email, 'password' => $password])) {
             $user = User::where('email', $email)->with('configuration', 'pack')->first();
+            if (!$user->email_verified_at) {
+                throw new EmailNotVerifiedException();
+            }
             $token = $user->createToken(env('SECRET_TOKEN', 'test_token'));
 
             return response()->json(['user' => $user, 'access_token' => $token->plainTextToken]);
