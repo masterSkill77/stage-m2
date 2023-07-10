@@ -11,7 +11,7 @@ class TickerService
     {
         $lastUpdatedTime = Cache::get('date_last_ticker');
         $tickerCached = Cache::get('ticker');
-        if (time() - $lastUpdatedTime > 30 * 60 || !$tickerCached) {
+        if (time() - $lastUpdatedTime > 24 * 60 * 60 || !$tickerCached) {
             Cache::put('date_last_ticker', time());
             $response = $this->getFromBinance();
             Cache::put('ticker', $response);
