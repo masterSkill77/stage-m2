@@ -37,7 +37,7 @@ Route::put('/profile/{id}', [AuthController::class, 'updateProfile'])->middlewar
 Route::apiResource('auction', AuctionController::class)->middleware('auth:sanctum')->except(['store']);
 Route::post('auction', [AuctionController::class, 'store'])->middleware(['auth:sanctum', 'canCreateAuction']);
 Route::apiResource('nft', NftController::class)->middleware('auth:sanctum')->except(['store']);
-Route::post('nft', [AuctionController::class, 'store'])->middleware(['auth:sanctum', 'canCreateNft']);
+Route::post('nft', [NftController::class, 'store'])->middleware(['auth:sanctum', 'canCreateNft']);
 Route::apiResource('bid', BidController::class)->middleware('auth:sanctum')->except(['store']);
 Route::post('bid', [AuctionController::class, 'store'])->middleware(['auth:sanctum', 'canMakeBid']);
 
