@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Dto\TransactionDto;
 use App\Jobs\ProcessChargeJob;
 use App\Models\Auction;
 use App\Models\Nft;
 use App\Models\Pack;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserConfig;
 use Exception;
@@ -14,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class PaymentService
 {
     protected $stripe;
-    public function __construct()
+    public function __construct(public TransactionService $transactionService)
     {
         $this->stripe = new \Stripe\StripeClient(
             env('STRIPE_SECRET')
@@ -73,6 +75,10 @@ class PaymentService
                 $user->current_allow_auction += $pack->pack_max_auction_creation;
                 $user->current_allow_nft += $pack->pack_max_nft_creation;
                 $user->save();
+
+                $transaction = new TransactionDto(Transaction::AUCTION_PAYMENT, $this->auction->id, 'ORDER' . $this->auction->id, $this->auction->id, $this->config->user_id);
+                $this->transactionService->store($transaction);
+
                 return $charge;
             } catch (Exception $e) {
                 throw new Exception($e->getMessage());

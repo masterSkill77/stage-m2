@@ -2,7 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Dto\TransactionDto;
 use App\Models\Auction;
+use App\Models\Transaction;
+use App\Services\TransactionService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -16,6 +19,7 @@ class ProcessChargeJob implements ShouldQueue
     protected $auction;
     protected $stripe;
     protected $config;
+    protected $transactionService;
 
     /**
      * Create a new job instance.
@@ -28,6 +32,7 @@ class ProcessChargeJob implements ShouldQueue
         $this->auction = $auction;
         $this->stripe = $stripe;
         $this->config = $config;
+        $this->transactionService = new TransactionService();
     }
 
     /**
@@ -63,7 +68,8 @@ class ProcessChargeJob implements ShouldQueue
                     'destination' => 'acct_1N2cL7HC6nuER2HS'
                 ],
             ]);
-
+            $transaction = new TransactionDto(Transaction::AUCTION_PAYMENT, $this->auction->id, 'ORDER' . $this->auction->id, $this->auction->id, $this->config->user_id);
+            $this->transactionService->store($transaction);
             $amountToCharge -= $amount;
 
             return $this->auction;
