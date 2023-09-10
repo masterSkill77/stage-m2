@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+    return User::with("pack", "configuration")->where('id', $request->user()->id)->first();
 });
 
 Route::apiResource('form', FormController::class);
