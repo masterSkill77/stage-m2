@@ -49,4 +49,22 @@ class BlockchainService
             ]);
         }
     }
+
+    public function transfertEthOnBlockchain(User $from, User $to, float $amount)
+    {
+        $response = Http::post($this->url . "/pay-with-eth", [
+            'from' => $from->etherum_adress,
+            'to' => $to->etherum_adress,
+            'amount' => $amount . ""
+        ]);
+
+        if ($response->status() == 200) {
+            return $response->json();
+        } else {
+            return response()->json([
+                'success' => false,
+                'error' => 'Une erreur est survenue lors de la transfert du NFT.'
+            ]);
+        }
+    }
 }

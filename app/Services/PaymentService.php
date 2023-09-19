@@ -28,15 +28,17 @@ class PaymentService
         $fromUser = User::find($auction->owner_id)->first();
         $nft = Nft::where('id', $auction->nft_id)->first();
 
-
         if ($config) {
             try {
-                $job = new ProcessChargeJob($auction, $this->stripe, $config);
-
+                if ($auction->payment == Auction::USDT_PAYMENT) {
+                    $job = new ProcessChargeJob($auction, $this->stripe, $config);
+                    dispatch($job);
+                } else {
+                    (new BlockchainService)->transfertEthOnBlockchain($fromUser, $user, $auction->current_bid);
+                }
                 (new AuctionService)->pay($auction);
-                dispatch($job);
                 (new BlockchainService)->transfertNftOnBlockchain($fromUser, $user, $nft);
-                (new NftService(new BlockchainService))->affectNft($user->id, $fromUser->id, $auction->nft_id);
+                (new NftService(new BlockchainService, new PackForUserService))->affectNft($user->id, $fromUser->id, $auction->nft_id);
                 return $auction;
             } catch (Exception $e) {
                 throw new Exception($e->getMessage());

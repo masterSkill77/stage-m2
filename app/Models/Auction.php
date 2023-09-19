@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Auction extends Model
 {
+    public const CRYPTO_PAYMENT = "ETH";
+    public const USDT_PAYMENT = "USDT";
     use HasFactory;
     protected $fillable = ['end_date', 'start_date', 'current_bid', 'start_price', 'owner_id', 'nft_id', 'auction_uuid', 'is_paid', 'payment'];
 
