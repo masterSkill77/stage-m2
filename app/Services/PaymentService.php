@@ -78,7 +78,7 @@ class PaymentService
                 $user->current_allow_nft += $pack->pack_max_nft_creation;
                 $user->save();
 
-                $transaction = new TransactionDto(Transaction::AUCTION_PAYMENT, $this->auction->id, 'ORDER' . $this->auction->id, $this->auction->id, $this->config->user_id);
+                $transaction = new TransactionDto(Transaction::PACK_PAYMENT, $pack->id, 'ORDER' . $pack->id, $pack->id, $user->id);
                 $this->transactionService->store($transaction);
 
                 return $charge;
