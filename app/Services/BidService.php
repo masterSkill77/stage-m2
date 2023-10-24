@@ -54,4 +54,9 @@ class BidService
             $auctionId
         )->whereNot('bidder_id', $exceptBidderId)->groupBy('bidder_id')->get();
     }
+
+    public function getAllBidForUser(int $userId)
+    {
+        return Bid::with('auction')->where('bidder_id', $userId)->get();
+    }
 }

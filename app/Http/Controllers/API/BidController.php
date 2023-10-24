@@ -18,4 +18,11 @@ class BidController extends Controller
 
         return response()->json(['data' => $bid]);
     }
+    public function getBidsForUser()
+    {
+        $user = auth()->user();
+
+        $bids = $this->bidService->getAllBidForUser($user->id);
+        return response()->json($bids);
+    }
 }
