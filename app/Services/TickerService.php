@@ -24,4 +24,31 @@ class TickerService
         $response = Http::get('https://api.binance.com/api/v3/ticker/24hr');
         return array_slice([...$response->json()], 0, 15);
     }
+
+    /**
+     * Bougies historiques d'une paire (cache 5 minutes).
+     * Lève une exception si Binance ne répond pas, sans rien mettre en cache.
+     */
+    public function history(string $symbol, string $interval, int $limit): array
+    {
+        return Cache::remember("klines:{$symbol}:{$interval}:{$limit}", 300, function () use ($symbol, $interval, $limit) {
+            $response = Http::timeout(10)->get('https://api.binance.com/api/v3/klines', [
+                'symbol' => $symbol,
+                'interval' => $interval,
+                'limit' => $limit,
+            ]);
+
+            if ($response->failed()) {
+                throw new \RuntimeException('Binance klines indisponible');
+            }
+
+            return collect($response->json())->map(fn ($kline) => [
+                'time' => (int) $kline[0],
+                'open' => (float) $kline[1],
+                'high' => (float) $kline[2],
+                'low' => (float) $kline[3],
+                'close' => (float) $kline[4],
+            ])->values()->all();
+        });
+    }
 }

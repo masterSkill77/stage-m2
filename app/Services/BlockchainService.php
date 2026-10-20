@@ -11,11 +11,18 @@ class BlockchainService
     private $url;
     public function __construct()
     {
-        $this->url  = env('APP_NFT_URL', 'http://localhost:3000/nft');
+        $this->url  = config('services.blockchain.url') . '/nft';
+    }
+
+    private function http()
+    {
+        return Http::withHeaders([
+            'X-Internal-Token' => config('services.internal.token'),
+        ]);
     }
     public function createNftOnBlockchain(array $data, User $user)
     {
-        $response = Http::post($this->url, [
+        $response = $this->http()->post($this->url, [
             'tokenName' => $data['title'],
             'tokenDescription' => $data['description'],
             'tokenURI' => $data['image_uri'],
@@ -34,7 +41,7 @@ class BlockchainService
 
     public  function transfertNftOnBlockchain(User $from, User $to, Nft $nft)
     {
-        $response = Http::post($this->url . "/transfer", [
+        $response = $this->http()->post($this->url . "/transfer", [
             'from' => $from->etherum_adress,
             'to' => $to->etherum_adress,
             'tokenId' => $nft->token_id
@@ -52,7 +59,7 @@ class BlockchainService
 
     public function transfertEthOnBlockchain(User $from, User $to, float $amount)
     {
-        $response = Http::post($this->url . "/pay-with-eth", [
+        $response = $this->http()->post($this->url . "/pay-with-eth", [
             'from' => $from->etherum_adress,
             'to' => $to->etherum_adress,
             'amount' => $amount . ""

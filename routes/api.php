@@ -9,6 +9,7 @@ use App\Http\Controllers\API\PackController;
 use App\Http\Controllers\API\PaiementController;
 use App\Http\Controllers\API\TransfertController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GatewayController;
 use App\Http\Controllers\NewsController;
 use App\Models\User;
 use App\Services\TickerService;
@@ -71,6 +72,15 @@ Route::prefix('nft')->middleware(['auth:sanctum'])->group(function () {
 
 Route::get('news', [NewsController::class, 'index']);
 
+// Gateway : toutes les requêtes vers les microservices passent par Laravel
+Route::prefix('chat')->middleware('auth:sanctum')->group(function () {
+    Route::any('{path?}', [GatewayController::class, 'chat'])->where('path', '.*');
+});
+
+Route::prefix('blockchain')->middleware('auth:sanctum')->group(function () {
+    Route::any('{path?}', [GatewayController::class, 'blockchain'])->where('path', '.*');
+});
+
 
 Route::get('/check-exists/{emailOrUsername}', function ($emailOrUsername) {
     $exists =  User::where('email', $emailOrUsername)->orWhere('username', $emailOrUsername)->get();
@@ -83,6 +93,21 @@ Route::get("ticker", function () {
     $tickerService = new TickerService();
     $response = $tickerService->show();
     return response()->json($response);
+});
+
+Route::get("ticker/history", function (Request $request) {
+    $validated = $request->validate([
+        'symbol' => ['required', 'regex:/^[A-Z0-9]{2,20}$/'],
+        'interval' => ['required', 'in:1h,4h,1d'],
+        'limit' => ['required', 'integer', 'min:2', 'max:200'],
+    ]);
+
+    try {
+        $candles = (new TickerService())->history($validated['symbol'], $validated['interval'], (int) $validated['limit']);
+        return response()->json($candles);
+    } catch (\Throwable $e) {
+        return response()->json(['message' => 'Historique indisponible'], 502);
+    }
 });
 
 Route::middleware('auth:sanctum')->prefix('users')->group(function () {
