@@ -47,14 +47,11 @@ class BlockchainService
             'tokenId' => $nft->token_id
         ]);
 
-        if ($response->status() == 200) {
+        // Le service renvoie 200 même en cas d'échec : on regarde le champ success
+        if ($response->status() == 200 && $response->json('success') === true) {
             return $response->json();
-        } else {
-            return response()->json([
-                'success' => false,
-                'error' => 'Une erreur est survenue lors de la transfert du NFT.'
-            ]);
         }
+        throw new \RuntimeException('BLOCKCHAIN_TRANSFER_FAILED');
     }
 
     public function transfertEthOnBlockchain(User $from, User $to, float $amount)
@@ -65,13 +62,10 @@ class BlockchainService
             'amount' => $amount . ""
         ]);
 
-        if ($response->status() == 200) {
+        // Le service renvoie 200 même en cas d'échec : on regarde le champ success
+        if ($response->status() == 200 && $response->json('success') === true) {
             return $response->json();
-        } else {
-            return response()->json([
-                'success' => false,
-                'error' => 'Une erreur est survenue lors de la transfert du NFT.'
-            ]);
         }
+        throw new \RuntimeException('BLOCKCHAIN_TRANSFER_FAILED');
     }
 }

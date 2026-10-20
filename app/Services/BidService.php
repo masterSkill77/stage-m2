@@ -3,11 +3,15 @@
 namespace App\Services;
 
 use App\Events\BidPlaced;
+use App\Exceptions\AuctionNotOpenException;
 use App\Exceptions\BidTooLowException;
+use App\Exceptions\CannotBidOwnAuctionException;
+use App\Models\Auction;
 use App\Models\Bid;
 use App\Models\User;
 use App\Notifications\NewBidNotification;
 use Exception;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class BidService
@@ -20,7 +24,14 @@ class BidService
 
         return DB::transaction(function () use ($data) {
             try {
-                $auction = $this->auctionService->getAuction($data['auction_id']);
+                // Verrou sur l'enchère : deux offres simultanées ne peuvent pas se valider sur le même prix
+                $auction = Auction::lockForUpdate()->where('auction_uuid', $data['auction_id'])->firstOrFail();
+                if ((int) $auction->owner_id === (int) $data['bidder_id'])
+                    throw new CannotBidOwnAuctionException();
+                $now = now();
+                if (($auction->start_date && $now->lt(Carbon::parse($auction->start_date)))
+                    || ($auction->end_date && $now->gt(Carbon::parse($auction->end_date))))
+                    throw new AuctionNotOpenException();
                 if ($auction->current_bid >= $data['bid_amount'] || $auction->start_price >= $data['bid_amount'])
                     throw new BidTooLowException();
                 $data['auction_id'] = $auction->id;

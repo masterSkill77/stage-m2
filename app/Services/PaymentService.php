@@ -3,49 +3,72 @@
 namespace App\Services;
 
 use App\Dto\TransactionDto;
+use App\Exceptions\PaymentNotAllowedException;
 use App\Jobs\ProcessChargeJob;
 use App\Models\Auction;
+use App\Models\Bid;
 use App\Models\Nft;
 use App\Models\Pack;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserConfig;
 use Exception;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PaymentService
 {
-    protected $stripe;
+    protected ?\Stripe\StripeClient $stripeClient = null;
+
     public function __construct(public TransactionService $transactionService)
     {
-        $this->stripe = new \Stripe\StripeClient(
-            env('STRIPE_SECRET')
-        );
     }
+
+    // Client Stripe créé à la demande : le paiement en ETH ne doit pas dépendre de la configuration Stripe
+    protected function stripe(): \Stripe\StripeClient
+    {
+        return $this->stripeClient ??= new \Stripe\StripeClient(env('STRIPE_SECRET'));
+    }
+    /**
+     * Paiement d'une enchère terminée : seul le gagnant (plus haute offre) peut payer,
+     * une seule fois. L'argent part de l'acheteur vers le vendeur, le NFT du vendeur vers l'acheteur.
+     */
     public function paiement(User $user, Auction $auction)
     {
-        $config = UserConfig::where('user_id', $user->id)->first();
-        $fromUser = User::find($auction->owner_id)->first();
-        $nft = Nft::where('id', $auction->nft_id)->first();
+        return DB::transaction(function () use ($user, $auction) {
+            // Verrou sur l'enchère : deux paiements simultanés ne peuvent pas passer
+            $auction = Auction::lockForUpdate()->findOrFail($auction->id);
 
-        if ($config) {
-            try {
-                if ($auction->payment == Auction::USDT_PAYMENT) {
-                    $job = new ProcessChargeJob($auction, $this->stripe, $config);
-                    dispatch($job);
-                } else {
-                    (new BlockchainService)->transfertEthOnBlockchain($fromUser, $user, $auction->current_bid);
+            if ($auction->is_paid || !$auction->end_date || now()->lt(Carbon::parse($auction->end_date)))
+                throw new PaymentNotAllowedException();
+
+            $winningBid = Bid::where('auction_id', $auction->id)->orderByDesc('bid_amount')->first();
+            if (!$winningBid || (int) $winningBid->bidder_id !== (int) $user->id)
+                throw new PaymentNotAllowedException();
+
+            $seller = User::findOrFail($auction->owner_id);
+            $nft = Nft::findOrFail($auction->nft_id);
+            $blockchain = new BlockchainService;
+
+            if ($auction->payment == Auction::USDT_PAYMENT) {
+                // Seul le paiement par carte exige une configuration de carte
+                $config = UserConfig::where('user_id', $user->id)->first();
+                if (!$config) {
+                    throw new NotFoundHttpException('CONFIG_NOT_FOUND');
                 }
-                (new AuctionService)->pay($auction);
-                (new BlockchainService)->transfertNftOnBlockchain($fromUser, $user, $nft);
-                (new NftService(new BlockchainService, new PackForUserService))->affectNft($user->id, $fromUser->id, $auction->nft_id);
-                return $auction;
-            } catch (Exception $e) {
-                throw new Exception($e->getMessage());
+                // Exécuté tout de suite : si le débit échoue, le NFT ne bouge pas
+                dispatch_sync(new ProcessChargeJob($auction, $this->stripe(), $config));
+            } else {
+                $blockchain->transfertEthOnBlockchain($user, $seller, $auction->current_bid);
             }
-        } else {
-            throw new NotFoundHttpException('CONFIG_NOT_FOUND');
-        }
+
+            $blockchain->transfertNftOnBlockchain($seller, $user, $nft);
+            (new AuctionService)->pay($auction);
+            (new NftService(new BlockchainService, new PackForUserService))->affectNft($user->id, $seller->id, $auction->nft_id);
+
+            return $auction;
+        });
     }
     public function upgradePack(User $user, $packId)
     {
@@ -53,7 +76,7 @@ class PaymentService
         $pack = Pack::where("id", $packId)->first();
         if ($config && $pack) {
             try {
-                $token = $this->stripe->tokens->create([
+                $token = $this->stripe()->tokens->create([
                     'card' => [
                         'number' => $config->card_number,
                         'exp_month' => $config->card_expires_month,
@@ -61,7 +84,7 @@ class PaymentService
                         'cvc' => $config->cvc,
                     ]
                 ]);
-                $charge = $this->stripe->charges->create([
+                $charge = $this->stripe()->charges->create([
                     'amount' => $pack->pack_price * 100,
                     'currency' => 'cad',
                     'source' => $token->id,

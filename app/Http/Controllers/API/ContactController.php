@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Resources\PublicUserResource;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -20,7 +21,8 @@ class ContactController extends Controller
     public function index()
     {
         $users = $this->friendsService->myFriends(auth()->user()->id);
-        return response()->json($users);
+        $friends = collect($users)->filter()->each->load('configuration');
+        return response()->json(PublicUserResource::collection($friends)->resolve());
     }
 
     /**
@@ -33,9 +35,28 @@ class ContactController extends Controller
         $userId = auth()->user()->id;
         if ($friendId == $userId)
             return response()->json(["error" => "CANNOT_AUTO_FRIEND"], Response::HTTP_BAD_REQUEST);
-        $friend = $this->friendsService->addFriend($userId, $friendId);
+        User::findOrFail($friendId);
+        $contact = $this->friendsService->addFriend($userId, $friendId);
 
-        return response()->json($friend, Response::HTTP_CREATED);
+        return response()->json(['status' => $contact->accepted_at ? 'accepted' : 'pending'], Response::HTTP_CREATED);
+    }
+
+    // Demandes d'ami reçues et pas encore acceptées
+    public function requests()
+    {
+        $users = $this->friendsService->incomingRequests(auth()->user()->id);
+        return response()->json(PublicUserResource::collection(collect($users)->each->load('configuration'))->resolve());
+    }
+
+    // Accepte la demande envoyée par $user
+    public function accept(User $user)
+    {
+        $contact = $this->friendsService->acceptRequest(auth()->user()->id, $user->id);
+
+        if (!$contact)
+            return response()->json(['error' => 'NO_REQUEST'], Response::HTTP_NOT_FOUND);
+
+        return response()->json(['status' => 'accepted']);
     }
 
     /**

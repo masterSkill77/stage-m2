@@ -14,7 +14,8 @@ class BidController extends Controller
     }
     public function store(CreateBidRequest $bid)
     {
-        $bid = $this->bidService->makeBid($bid->toArray());
+        // L'enchérisseur est toujours l'utilisateur connecté, jamais une valeur envoyée par le client
+        $bid = $this->bidService->makeBid(array_merge($bid->toArray(), ['bidder_id' => auth()->id()]));
 
         return response()->json(['data' => $bid]);
     }

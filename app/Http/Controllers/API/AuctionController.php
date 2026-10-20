@@ -33,11 +33,15 @@ class AuctionController extends Controller
     {
         $user = auth()->user();
         $nft = $this->nftService->getNft($request->nft_id);
+        abort_unless($nft, 404);
         if ($nft->owner_id != $user->id)
             throw new NotYourNftException();
-        $request['owner_id'] = $user->id;
-        $request['current_bid'] = $request['current_bid'] ?? 0;
-        $auction = $this->auctionService->store($request->toArray());
+        // Liste blanche : le client ne fixe ni le propriétaire, ni l'offre courante, ni le statut de paiement
+        $data = $request->only(['nft_id', 'start_date', 'end_date', 'start_price', 'payment']);
+        $data['owner_id'] = $user->id;
+        $data['current_bid'] = 0;
+        $data['is_paid'] = 0;
+        $auction = $this->auctionService->store($data);
         $value = $this->packForUserService->auctioned($user);
         return response()->json(['data' => $auction]);
     }
@@ -58,19 +62,8 @@ class AuctionController extends Controller
         $allAuctions = $this->auctionService->myAuctions(auth()->user()->id);
         return response()->json(['data' => $allAuctions]);
     }
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

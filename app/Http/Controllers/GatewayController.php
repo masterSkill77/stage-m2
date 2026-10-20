@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\FriendsService;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -34,6 +35,8 @@ class GatewayController extends Controller
 
         if ($request->isMethod('POST') && $segments === []) {
             abort_unless((string) $request->input('from') === $me, 403, 'Expéditeur non autorisé.');
+            $to = (int) $request->input('to');
+            abort_unless($to === (int) $me || app(FriendsService::class)->itExist((int) $me, $to), 403, 'Seuls vos amis peuvent recevoir vos messages.');
 
             return;
         }

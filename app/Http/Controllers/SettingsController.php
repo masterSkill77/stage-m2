@@ -42,6 +42,6 @@ class SettingsController extends Controller
 
         $user->save();
 
-        return response()->json($user->load('pack', 'configuration'));
+        return response()->json($user->load('pack', 'configuration')->makePrivateVisible());
     }
 }

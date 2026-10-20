@@ -39,7 +39,18 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
+        'email',
+        'email_verified_at',
+        'current_allow_bid',
+        'current_allow_auction',
+        'current_allow_nft',
     ];
+
+    // Champs privés, visibles uniquement pour l'utilisateur connecté (/user, connexion, paramètres)
+    public function makePrivateVisible(): static
+    {
+        return $this->makeVisible(['email', 'email_verified_at', 'current_allow_bid', 'current_allow_auction', 'current_allow_nft']);
+    }
 
     /**
      * The attributes that should be cast.

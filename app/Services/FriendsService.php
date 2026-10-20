@@ -5,58 +5,103 @@ namespace App\Services;
 use App\Exceptions\AlreadyFriendException;
 use App\Models\Contact;
 use Exception;
-use Illuminate\Database\Eloquent\Collection;
 
 class FriendsService
 {
+    // Amis confirmés uniquement : les demandes en attente n'apparaissent pas dans la liste d'amis
     public function myFriends(int $userId)
     {
-        $myFriend = [...Contact::with(['user', 'friend'])->myFriend($userId)->get()];
+        $contacts = Contact::with(['user', 'friend'])->myFriend($userId)->accepted()->get();
 
-        $result = array_map(function ($element) use ($userId) {
-            if ($userId == $element->user_id) {
-                return ($element->friend);
-            } else if ($userId == $element->friend_id) {
-                return ($element->user);
-            }
-        }, $myFriend);
-        return $result;
+        return $contacts->map(fn ($contact) => $contact->user_id == $userId ? $contact->friend : $contact->user)->values()->all();
     }
 
     public function itExist($userId, $friendId)
     {
-        $users = $this->myFriends($userId);
-        $exist = false;
-        foreach ($users as $user) {
+        foreach ($this->myFriends($userId) as $user) {
             if ($user->id == $friendId)
                 return true;
         }
-        return $exist;
+        return false;
     }
-    public function addFriend(int $userId, int $friend_id)
+
+    /**
+     * Envoie une demande d'ami. Si l'autre personne avait déjà envoyé une demande, elle est acceptée.
+     */
+    public function addFriend(int $userId, int $friendId): Contact
     {
-        if ($this->itExist($userId, $friend_id))
-            throw new AlreadyFriendException();
+        $existing = Contact::betweenUsers($userId, $friendId)->first();
 
-        $friend = new Contact([
+        if ($existing) {
+            if ($existing->accepted_at)
+                throw new AlreadyFriendException();
+
+            // Demande reçue de l'autre personne : on l'accepte au lieu d'en créer une seconde
+            if ($existing->user_id != $userId) {
+                $existing->accepted_at = now();
+                $existing->save();
+            }
+            return $existing;
+        }
+
+        $contact = new Contact([
             'user_id' => $userId,
-            'friend_id' => $friend_id
+            'friend_id' => $friendId
         ]);
-        $friend->save();
+        $contact->save();
 
-        return $friend;
+        return $contact;
+    }
+
+    // Accepte une demande reçue d'un utilisateur donné
+    public function acceptRequest(int $userId, int $requesterId): ?Contact
+    {
+        $contact = Contact::where('user_id', $requesterId)
+            ->where('friend_id', $userId)
+            ->whereNull('accepted_at')
+            ->first();
+
+        if (!$contact)
+            return null;
+
+        $contact->accepted_at = now();
+        $contact->save();
+
+        return $contact;
+    }
+
+    // Demandes reçues et pas encore acceptées : renvoie les utilisateurs qui les ont envoyées
+    public function incomingRequests(int $userId)
+    {
+        return Contact::with('user')
+            ->where('friend_id', $userId)
+            ->whereNull('accepted_at')
+            ->get()
+            ->pluck('user')
+            ->values()
+            ->all();
+    }
+
+    // Statut de l'amitié vu depuis $userId : none, outgoing, incoming ou friends
+    public function friendshipStatus(int $userId, int $otherId): string
+    {
+        $contact = Contact::betweenUsers($userId, $otherId)->first();
+
+        if (!$contact)
+            return 'none';
+        if ($contact->accepted_at)
+            return 'friends';
+
+        return $contact->user_id == $userId ? 'outgoing' : 'incoming';
     }
 
     public function removeFriend(int $userId, int $friendId)
     {
-        $resultat = Contact::where('user_id', $userId)->where('friend_id', $friendId)->first();
-        if ($resultat)
-            return  $resultat->delete();
-        $resultat = Contact::where('user_id', $friendId)->where('friend_id', $userId)->first();
+        $contact = Contact::betweenUsers($userId, $friendId)->first();
 
-        if ($resultat)
-            return  $resultat->delete();
-        else
-            return false;
+        if ($contact)
+            return $contact->delete();
+
+        return false;
     }
 }
