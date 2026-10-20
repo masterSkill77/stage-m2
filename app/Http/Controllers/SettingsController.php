@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserConfig;
+use App\Services\ImageUploadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -10,6 +12,33 @@ use Illuminate\Validation\Rules\Password;
 
 class SettingsController extends Controller
 {
+    /**
+     * Photo de profil : 1 Mo maximum, stockée sur le disque public.
+     * Le format reste celui attendu par le front : [{"name": ..., "content": <url>}].
+     */
+    public function avatar(Request $request, ImageUploadService $images): JsonResponse
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,webp|max:1024',
+        ]);
+
+        $config = UserConfig::firstOrCreate(['user_id' => $request->user()->id]);
+        $images->delete($this->currentAvatarUrl($config));
+
+        $url = $images->store($request->file('avatar'), 'avatars');
+        $config->profile_image = json_encode([['name' => 'avatar', 'content' => $url]]);
+        $config->save();
+
+        return response()->json($request->user()->load('pack', 'configuration')->makePrivateVisible());
+    }
+
+    private function currentAvatarUrl(UserConfig $config): ?string
+    {
+        $images = json_decode((string) $config->profile_image, true);
+
+        return $images[0]['content'] ?? null;
+    }
+
     /**
      * Met à jour le profil de l'utilisateur connecté.
      * Le mot de passe n'est modifié que si l'ancien est fourni et correct.

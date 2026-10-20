@@ -9,6 +9,8 @@ use App\Http\Controllers\API\PaiementController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GatewayController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\UploadController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Resources\PublicUserResource;
 use App\Services\FriendsService;
@@ -34,6 +36,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::put('/settings', [SettingsController::class, 'update'])->middleware('auth:sanctum');
+Route::post('/settings/avatar', [SettingsController::class, 'avatar'])->middleware('auth:sanctum');
+Route::post('/upload/nft-image', [UploadController::class, 'nftImage'])->middleware('auth:sanctum');
+Route::get('/notifications/summary', [NotificationController::class, 'summary'])->middleware('auth:sanctum');
 
 Route::apiResource('auction', AuctionController::class)->middleware('auth:sanctum')->only(['index', 'show']);
 Route::post('auction', [AuctionController::class, 'store'])->middleware(['auth:sanctum', 'canCreateAuction']);
