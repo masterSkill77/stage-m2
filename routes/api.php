@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AdminPackController;
 use App\Http\Controllers\API\AuctionController;
 use App\Http\Controllers\API\BidController;
 use App\Http\Controllers\API\ContactController;
@@ -68,6 +69,13 @@ Route::prefix('/paiement')->middleware(['auth:sanctum'])->group(function () {
 
 // Les packs sont créés côté serveur uniquement (seeder), jamais par un client
 Route::get('pack', [PackController::class, 'index']);
+
+// Administration des packs (superadmin uniquement)
+Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('packs', [AdminPackController::class, 'index']);
+    Route::post('packs', [AdminPackController::class, 'store']);
+    Route::put('packs/{pack}', [AdminPackController::class, 'update']);
+});
 
 Route::prefix('nft')->middleware(['auth:sanctum'])->group(function () {
     Route::get('/category/{idCategory}', [NftController::class, 'getByCategory']);
