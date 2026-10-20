@@ -11,6 +11,7 @@ use App\Http\Controllers\API\TransfertController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GatewayController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\SettingsController;
 use App\Models\User;
 use App\Services\TickerService;
 use Illuminate\Http\Request;
@@ -34,6 +35,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::apiResource('form', FormController::class);
 Route::put('/profile/{id}', [AuthController::class, 'updateProfile'])->middleware('auth:sanctum');
+Route::put('/settings', [SettingsController::class, 'update'])->middleware('auth:sanctum');
 
 Route::apiResource('auction', AuctionController::class)->middleware('auth:sanctum')->except(['store']);
 Route::post('auction', [AuctionController::class, 'store'])->middleware(['auth:sanctum', 'canCreateAuction']);
