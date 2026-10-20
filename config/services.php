@@ -31,4 +31,18 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // Microservices internes, joignables uniquement via la gateway (Laravel)
+    'chat' => [
+        'url' => env('CHAT_SERVICE_URL', 'http://127.0.0.1:4001/api/v1'),
+    ],
+
+    'blockchain' => [
+        'url' => env('BLOCKCHAIN_SERVICE_URL', 'http://127.0.0.1:4000'),
+    ],
+
+    // Secret partagé envoyé dans l'en-tête X-Internal-Token à chaque microservice
+    'internal' => [
+        'token' => env('INTERNAL_SERVICE_TOKEN'),
+    ],
+
 ];

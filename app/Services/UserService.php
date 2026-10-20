@@ -12,30 +12,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
-    public function updateProfile(array $data, $userId)
-    {
-        return DB::transaction(function () use ($data, $userId) {
-            try {
-                $user = User::findOrFail($userId);
-                $$data['password'] = Hash::make($data['password']);
-
-                $user->fill($data);
-                $user->save();
-                if (is_array($data['profile_image']))
-                    $data['profile_image'] = ($data['profile_image'][0]['content']);
-                else
-                    $data['profile_image'] = ($data['profile_image']);
-                $config = UserConfig::where('user_id', $userId)->first();
-                $config->fill($data);
-                $config->save();
-                DB::commit();
-                return ['user' => $user];
-            } catch (Exception $e) {
-                DB::rollBack();
-                throw new Error($e->getMessage());
-            }
-        });
-    }
     public function register(array $data)
     {
 
@@ -46,13 +22,14 @@ class UserService
 
                 $user = new User($data);
                 $user->save();
-                $data['profile_image'] = json_encode($data['profile_image']);
+                // Sans photo à l'inscription, la configuration garde une liste vide (pas de "null" en base)
+                $data['profile_image'] = json_encode($data['profile_image'] ?? []);
 
                 $config = new UserConfig($data);
                 $config->user_id = $user->id;
                 $config->save();
                 $token = $user->createToken(env('SECRET_TOKEN', 'test_token'));
-                $user->notify(new UserCreatedNotification($user, $token->plainTextToken));
+                $user->notify(new UserCreatedNotification($user));
                 DB::commit();
                 return ['user' => $user, 'token' => $token->plainTextToken];
             } catch (Exception $e) {
@@ -62,7 +39,7 @@ class UserService
         });
     }
 
-    public function verifyEmail($userId, $token)
+    public function verifyEmail($userId)
     {
         $user = User::findOrFail($userId);
         $user->email_verified_at = now();

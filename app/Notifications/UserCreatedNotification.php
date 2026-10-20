@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\URL;
 
 class UserCreatedNotification extends Notification
 {
@@ -15,7 +16,7 @@ class UserCreatedNotification extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct(public User $user, public string $token)
+    public function __construct(public User $user)
     {
         //
     }
@@ -37,7 +38,13 @@ class UserCreatedNotification extends Notification
     {
         return (new MailMessage)
             ->subject('Welcome - Verify email')
-            ->markdown('vendor.notification.email-verify', ['user' => $this->user, 'token' => $this->token]);
+            ->markdown('vendor.notification.email-verify', ['user' => $this->user, 'url' => $this->verificationUrl()]);
+    }
+
+    // Lien signé et daté : seul le serveur peut le générer, et il expire
+    private function verificationUrl(): string
+    {
+        return URL::temporarySignedRoute('verify.email', now()->addDay(), ['userId' => $this->user->id]);
     }
 
     /**

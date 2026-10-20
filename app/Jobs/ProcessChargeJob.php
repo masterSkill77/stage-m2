@@ -71,8 +71,8 @@ class ProcessChargeJob implements ShouldQueue
             $transaction = new TransactionDto(Transaction::AUCTION_PAYMENT, $this->auction->id, 'ORDER' . $this->auction->id, $this->auction->id, $this->config->user_id);
             $this->transactionService->store($transaction);
             $amountToCharge -= $amount;
-
-            return $this->auction;
         }
+
+        return $this->auction;
     }
 }

@@ -25,7 +25,6 @@ class CreateBidRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'bidder_id' => 'required',
             'auction_id' => 'required',
             'bid_amount' => 'required'
         ];

@@ -9,5 +9,9 @@ class Pack extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['pack_name', 'pack_price', 'pack_max_nft_creation', 'pack_max_auction_creation', 'pack_max_bid'];
+    protected $fillable = ['pack_name', 'pack_price', 'pack_max_nft_creation', 'pack_max_auction_creation', 'pack_max_bid', 'is_active'];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 }

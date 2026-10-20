@@ -26,16 +26,12 @@ class UserRegisterRequest extends FormRequest
     {
         return [
             'name' => 'string',
-            'email' => 'email|required',
-            'password' => 'required',
+            'email' => 'email|required|unique:users,email',
+            'password' => 'required|string|min:8',
             'lastname' => 'required',
-            'username' => 'required',
+            'username' => 'required|unique:users,username',
             'etherum_adress' => 'required',
-            'profile_image' => 'array',
-            'card_number' => 'required',
-            'card_expires_month' => 'required',
-            'card_expires_year' => 'required',
-            'cvc' => 'required'
+            'profile_image' => 'nullable|array',
         ];
     }
 

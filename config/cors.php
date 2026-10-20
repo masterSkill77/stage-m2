@@ -19,7 +19,8 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    // Origines du front, séparées par des virgules (CORS_ALLOWED_ORIGINS dans .env)
+    'allowed_origins' => array_filter(explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:5180'))),
 
     'allowed_origins_patterns' => [],
 

@@ -8,7 +8,7 @@ class PackService
 {
     public function listsOfPack()
     {
-        return Pack::orderBy('pack_price', 'ASC')->get();
+        return Pack::where('is_active', true)->orderBy('pack_price', 'ASC')->get();
     }
     public function store(array $data)
     {

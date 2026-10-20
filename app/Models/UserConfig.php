@@ -9,4 +9,7 @@ class UserConfig extends Model
 {
     use HasFactory;
     protected $fillable = ['profile_image', 'card_number', 'card_expires_month', 'card_expires_year', 'cvc', 'user_id'];
+
+    // Données de carte jamais renvoyées au client, même à leur propriétaire
+    protected $hidden = ['card_number', 'cvc'];
 }

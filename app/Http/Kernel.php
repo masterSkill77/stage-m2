@@ -66,6 +66,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'canMakeBid' => \App\Http\Middleware\CanBid::class,
         'canCreateAuction' => \App\Http\Middleware\CanCreateAuction::class,
+        'admin' => \App\Http\Middleware\EnsureAdmin::class,
         'canCreateNft' => \App\Http\Middleware\CanCreateNft::class
     ];
 }

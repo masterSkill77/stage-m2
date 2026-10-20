@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\EmailNotVerifiedException;
-use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\UserRegisterRequest;
 use App\Models\User;
 use App\Services\UserService;
@@ -37,19 +36,15 @@ class AuthController extends Controller
             }
             $token = $user->createToken(env('SECRET_TOKEN', 'test_token'));
 
-            return response()->json(['user' => $user, 'access_token' => $token->plainTextToken]);
+            return response()->json(['user' => $user->makePrivateVisible(), 'access_token' => $token->plainTextToken]);
         };
         return response()->json(["message" => "Unauthorized"], Response::HTTP_UNAUTHORIZED);
     }
 
-    public function verifyMail($userId, $token)
+    public function verifyMail($userId)
     {
-        $user = $this->userService->verifyEmail($userId, $token);
+        $user = $this->userService->verifyEmail($userId);
         return response()->redirectTo(env('URL_CLIENT') . '/login');
     }
 
-    public function updateProfile(UpdateProfileRequest $request, $userId)
-    {
-        return $request->all();
-    }
 }
